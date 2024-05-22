@@ -1,0 +1,58 @@
+1. feladat
+
+select sz.szoba_id, count(*)
+from szoba sz left join foglalas f on sz.szoba_id = f.szoba_fk
+group by sz.szoba_id
+
+3. feladat
+
+select sz.szallas_nev, szo.szoba_id, avg(felnott_szam + gyermek_szam) over (partition by szo.szoba_id order by f.mettol between 5 preceding and current row)
+from szallashely sz join szoba szo on sz.szallas_id = szo.szallas_fk join foglalas f on f.szoba_fk = szo.szoba_id
+
+4. feladat
+
+select sz.szallas_nev, szo.potagy, sum(f.felnott_szam) + sum(f.gyermek_szam)
+from szallashely sz join szoba szo on sz.szallas_id = szo.szallas_fk
+join foglalas f on f.szoba_fk = szo.szoba_id
+group by rollup (sz.szallas_nev, szo.potagy)
+
+5. feladat
+
+CREATE TABLE #MASKED_GUEST
+(
+USERNEV nvarchar(20),
+NEV nvarchar(20)
+MASKED WITH (FUNCTION = 'partial(2, "XXX", 3)'),
+EMAIL nvarchar(60),
+SZAML_CIM nvarchar(100),
+SZUL_DAT date
+)
+
+6. feladat
+
+set konyvtar_nev "Fővárosi Könyvtár"
+hset konyv:1 cim 1984 szerzo "George Orwell" kiadas 1949
+sadd mufajok scifi fantasy krimi
+rpush kolcsonzottek "a hobbit" "gyuruk ura" "tronok harca"
+zadd szam 5 "a hobbit" 4 "gyuruk ura" 3 "tronok harca"
+
+7. feladat
+
+create table student (
+id  uuid primary key,
+nev text,
+teljesitett_felevek list <int>,
+eredmenyek map<int, float>,
+nyelvtudas set<text>)
+
+insert into student(id, nev teljesitett_felevek, eredmenyek, nyelvtudas)
+values (uuid(), 'Kovács Péter', [1,2,3], {1:3,00, 2:4,53, 3:4,66}, {'angol', 'német'})
+
+insert into student(id, nev teljesitett_felevek, eredmenyek, nyelvtudas)
+values (uuid(), 'Szalai Maja', [1,2,3, 4], {1:3,00, 2:4,03, 3:4,06, 4:5,00}, {'angol', 'francia'})
+
+8. feladat
+
+match (p:Person {name: 'Tom Hanks'}) - [:ACTED_IN] -> (m:Movie) <- [:ACTED_IN] - (q:Person)
+where q.name != 'Tom Hanks'
+return distinct q.name
